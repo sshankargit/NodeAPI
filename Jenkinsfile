@@ -16,8 +16,7 @@ pipeline {
         stage('Verify Environment') {
             steps {
                 bat 'node -v'
-                bat 'npm -v'
-                bat 'ollama list'
+                bat 'npm -v'                
             }
         }
 
