@@ -1,0 +1,18 @@
+{
+ "service":"qe-cicd-sample-api",
+ "framework":"Node.js Express SQLite",
+ "testFramework":"Jest and Supertest",
+ "seedData":{
+  "customers":[
+   {"customer_id":1001,"name":"John Smith","status":"ACTIVE","created_at":"2026-06-01"},
+   {"customer_id":1002,"name":"Priya Kumar","status":"ACTIVE","created_at":"2026-06-02"},
+   {"customer_id":1003,"name":"Maria Garcia","status":"INACTIVE","created_at":"2026-06-03"}
+  ],
+  "paidRevenue":775.49
+ },
+ "endpoints":[
+  {"method":"GET","path":"/health","expectedStatus":200,"requiredFields":["status","service"]},
+  {"method":"GET","path":"/customers/{id}","validExample":"/customers/1001","invalidExample":"/customers/9999","malformedExample":"/customers/abc","successStatus":200,"notFoundStatus":404,"requiredFields":["customer_id","name","status","created_at"],"validStatusValues":["ACTIVE","INACTIVE"]},
+  {"method":"GET","path":"/analytics/revenue","expectedStatus":200,"requiredFields":["metric","value","source","filter"],"expectedMetric":"totalRevenue","expectedValue":775.49}
+ ]
+}

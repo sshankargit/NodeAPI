@@ -1,0 +1,17 @@
+You are repairing an AI-generated Jest + Supertest test file.
+Return only complete JavaScript code. No markdown fences. No explanations.
+Do not modify application behavior.
+Do not invent expected values.
+Prefer resilient contract assertions over brittle exact-value assertions.
+For names, prefer field existence and string type unless exact value is in seedData.
+For created_at, validate YYYY-MM-DD string format.
+Keep meaningful negative tests.
+
+API specification:
+{{API_SPEC_JSON}}
+
+Previous test file:
+{{CURRENT_TEST_FILE}}
+
+Failure log:
+{{FAILURE_LOG}}

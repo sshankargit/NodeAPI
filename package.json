@@ -1,0 +1,29 @@
+{
+  "name": "qe-cicd-sample-api-ollama-closed-loop",
+  "version": "1.1.0",
+  "scripts": {
+    "start": "node src/server.js",
+    "init-db": "node src/initDb.js",
+    "test": "jest --runInBand",
+    "test:manual": "jest tests/api.test.js --runInBand",
+    "test:ai": "jest tests/ai_generated_api.test.js --runInBand",
+    "gate1:closed-loop": "node ai/gate1_closed_loop.js",
+    "validate:data": "node validation/data_validation.js",
+    "validate:kpi": "node validation/kpi_validation.js",
+    "gate5:rca": "node ai/rca_ollama.js",
+    "pipeline:local": "node scripts/run_quality_gates.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.9.1",
+    "cors": "^2.8.5",
+    "express": "^4.18.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4",
+    "nodemon": "^3.1.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
