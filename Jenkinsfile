@@ -6,6 +6,10 @@ pipeline {
         OLLAMA_MODEL = 'llama3.1'
     }
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     stages {
         stage('Checkout SCM') {
             steps {
