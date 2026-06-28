@@ -8,7 +8,7 @@ app.use(express.json());
 app.get("/health",(req,res)=>res.json({status:"UP",service:"qe-cicd-sample-api"}));
 app.get("/customers",(req,res)=>res.json(db.prepare("SELECT * FROM customers ORDER BY customer_id").all()));
 app.get("/customers/:id",(req,res)=>{
- const customer=db.prepare("SELECT * FROM customers WHERE customer_id=?").get(req.params.id);
+ const customer=db.prepare("SELECT * FROM customers WHERE customerid=?").get(req.params.id);
  if(!customer) return res.status(404).json({error:"Customer not found"});
  res.json(customer);
 });
