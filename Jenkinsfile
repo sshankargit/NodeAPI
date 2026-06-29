@@ -57,7 +57,7 @@ pipeline {
         stage('Gate 2 - API Validation') {
             steps {
                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    bat 'npm run test:api-validation'
+                    bat 'npm run gate2:api-validation'
                 }
             }
         }

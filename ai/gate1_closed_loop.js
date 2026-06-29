@@ -137,16 +137,28 @@ function writeGate1Summary(metrics, executionLog, phase) {
 
   const summary = {
     gate: "Gate 1 - Closed-loop AI-Assisted Test Generation",
-    status: metrics.finalStatus || "IN_PROGRESS",
+    status: finalStatus,
     phase,
     initialRunStatus: metrics.initialRunStatus,
     repairAttempted: metrics.repairAttempted,
     repairRunStatus: metrics.repairRunStatus,
     repairSuccessful: metrics.repairRunStatus === "PASS",
-    failureType: inferFailureType(combinedEvidence),
-    httpEvidence: extractHttpStatusEvidence(executionLog),
-    applicationErrorPresent: appErrors.trim().length > 0,
-    applicationErrorSample: appErrors.substring(0, 1500),
+
+    failureType:
+        finalStatus === "PASS"
+        ? "None"
+        : inferFailureType(combinedEvidence),
+
+    applicationErrorPresent:
+        finalStatus === "PASS"
+        ? false
+        : appErrors.trim().length > 0,
+
+    applicationErrorSample:
+        finalStatus === "PASS"
+        ? ""
+        : appErrors.substring(0, 1500),
+
     evidence: executionLog ? executionLog.substring(0, 3000) : "",
     generatedAt: new Date().toISOString()
   };
