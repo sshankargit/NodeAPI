@@ -10,8 +10,9 @@
     "gate1:closed-loop": "node ai/gate1_closed_loop.js",
     "validate:data": "node validation/data_validation.js",
     "validate:kpi": "node validation/kpi_validation.js",
-    "gate5:rca": "node ai/rca_ollama.js",
-    "pipeline:local": "node scripts/run_quality_gates.js"
+    "gate5:decision": "node ai/decision_intelligence.js",
+    "pipeline:local": "node scripts/run_quality_gates.js",
+    "gate2:api-validation": "node validation/gate2_api_validation.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.9.1",

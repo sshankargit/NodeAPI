@@ -57,7 +57,7 @@ pipeline {
         stage('Gate 2 - API Validation') {
             steps {
                 catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
-                    bat 'npm run test:manual'
+                    bat 'npm run test:api-validation'
                 }
             }
         }
@@ -78,9 +78,9 @@ pipeline {
             }
         }
 
-        stage('Gate 5 - AI RCA') {
+        stage('Gate 5 - AI Decision Intelligence') {
             steps {
-                bat 'npm run gate5:rca'
+                bat 'npm run gate5:decision'
             }
         }
 
@@ -107,7 +107,7 @@ pipeline {
         }
 
         failure {
-            echo 'Pipeline failed. Deployment blocked. Review validation/reports/gate5_ollama_rca_report.md'
+            echo 'Pipeline failed. Deployment blocked. Review validation/reports/gate5_decision_intelligence_report.md'
         }
     }
 }

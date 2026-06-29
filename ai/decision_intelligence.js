@@ -33,6 +33,8 @@ function buildStructuredSummary() {
   const gate4 = readJson("gate4_summary.json");
   const dataReport = readJson("data_validation_report.json");
   const kpiReport = readJson("kpi_validation_report.json");
+  const gate2 = readJson("gate2_summary.json");
+  const gate3 = readJson("gate3_summary.json");
 
   const gateResults = [];
 
@@ -51,7 +53,9 @@ function buildStructuredSummary() {
       failureType: "MissingSummary"
     });
   }
-
+  if (gate2) {
+    gateResults.push(gate2);
+  }
   gateResults.push({
     gate: "Gate 2 - API Validation",
     status: readText("gate2_api_tests.log").toLowerCase().includes("fail")
@@ -61,6 +65,10 @@ function buildStructuredSummary() {
       ? "APITestFailure"
       : "None"
   });
+
+  if (gate3) {
+     gateResults.push(gate3);
+ }
 
   if (dataReport && dataReport.checks) {
     const failedChecks = dataReport.checks.filter(c => c.status === "FAIL");
@@ -131,7 +139,9 @@ async function main() {
     "data_validation_report.json",
     "kpi_validation_report.json",
     "gate4_summary.json",
-    "application_errors.log"
+    "application_errors.log",
+    "gate2_summary.json",
+    "gate3_summary.json"
   ];
 
   const artifacts = artifactFiles
@@ -153,7 +163,7 @@ async function main() {
     )
     .replace("{{ARTIFACTS}}", artifacts);
 
-  fs.writeFileSync(path.join(reportDir, "gate5_rca_prompt.txt"), prompt);
+  fs.writeFileSync(path.join(reportDir, "gate5_decision_intelligence_prompt.txt"), prompt);
 
   let output;
 
@@ -174,7 +184,7 @@ ${error.message}
 `;
   }
 
-  fs.writeFileSync(path.join(reportDir, "gate5_ollama_rca_report.md"), output);
+  fs.writeFileSync(path.join(reportDir, "gate5_decision_intelligence_report.md"), output);
   console.log(output);
 
   if (structuredSummary.deploymentDecision === "BLOCK") {
