@@ -16,7 +16,7 @@ app.get("/customers",(req,res)=>res.json(db.prepare("SELECT * FROM customers ORD
 app.get("/customers/:id", (req, res) => {
   try {
     const customer = db.prepare(
-      "SELECT * FROM customers WHERE customerid = ?"
+      "SELECT * FROM customers WHERE customer_id = ?"
     ).get(req.params.id);
 
     if (!customer) {
