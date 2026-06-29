@@ -134,10 +134,11 @@ function readApplicationErrors() {
 function writeGate1Summary(metrics, executionLog, phase) {
   const appErrors = readApplicationErrors();
   const combinedEvidence = `${executionLog || ""}\n\nAPPLICATION ERRORS:\n${appErrors}`;
+  const finalStatus = metrics.finalStatus || "IN_PROGRESS";
 
   const summary = {
     gate: "Gate 1 - Closed-loop AI-Assisted Test Generation",
-    status: finalStatus,
+    status: metrics.finalStatus,
     phase,
     initialRunStatus: metrics.initialRunStatus,
     repairAttempted: metrics.repairAttempted,
