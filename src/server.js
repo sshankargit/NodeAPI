@@ -1,16 +1,42 @@
 const express = require("express");
 const cors = require("cors");
 const db = require("./db");
+const { logApplicationError } = require("./logger");
 const app = express();
 const port = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.get("/health",(req,res)=>res.json({status:"UP",service:"qe-cicd-sample-api"}));
 app.get("/customers",(req,res)=>res.json(db.prepare("SELECT * FROM customers ORDER BY customer_id").all()));
-app.get("/customers/:id",(req,res)=>{
- const customer=db.prepare("SELECT * FROM customers WHERE customerid=?").get(req.params.id);
- if(!customer) return res.status(404).json({error:"Customer not found"});
- res.json(customer);
+// app.get("/customers/:id",(req,res)=>{
+//  const customer=db.prepare("SELECT * FROM customers WHERE customerid=?").get(req.params.id);
+//  if(!customer) return res.status(404).json({error:"Customer not found"});
+//  res.json(customer);
+// });
+app.get("/customers/:id", (req, res) => {
+  try {
+    const customer = db.prepare(
+      "SELECT * FROM customers WHERE customerid = ?"
+    ).get(req.params.id);
+
+    if (!customer) {
+      return res.status(404).json({ error: "Customer not found" });
+    }
+
+    res.json(customer);
+  } catch (error) {
+    logApplicationError(
+      {
+        endpoint: "GET /customers/:id",
+        customerId: req.params.id
+      },
+      error
+    );
+
+    res.status(500).json({
+      error: "Internal Server Error"
+    });
+  }
 });
 app.get("/orders",(req,res)=>res.json(db.prepare("SELECT * FROM orders ORDER BY order_id").all()));
 app.get("/orders/:id",(req,res)=>{
