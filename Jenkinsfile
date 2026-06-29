@@ -1,13 +1,13 @@
 pipeline {
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     environment {
         OLLAMA_HOST = 'http://localhost:11434'
         OLLAMA_MODEL = 'llama3.1'
-    }
-
-    options {
-        skipDefaultCheckout(true)
     }
 
     stages {
@@ -20,7 +20,7 @@ pipeline {
         stage('Verify Environment') {
             steps {
                 bat 'node -v'
-                bat 'npm -v'                
+                bat 'npm -v'
             }
         }
 
@@ -38,25 +38,33 @@ pipeline {
 
         stage('Gate 1 - AI Test Generation') {
             steps {
-                bat 'npm run gate1:closed-loop'
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    bat 'npm run gate1:closed-loop'
+                }
             }
         }
 
         stage('Gate 2 - API Validation') {
             steps {
-                bat 'npm run test:manual'
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    bat 'npm run test:manual'
+                }
             }
         }
 
         stage('Gate 3 - Data Validation') {
             steps {
-                bat 'npm run validate:data'
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    bat 'npm run validate:data'
+                }
             }
         }
 
         stage('Gate 4 - KPI Validation') {
             steps {
-                bat 'npm run validate:kpi'
+                catchError(buildResult: 'FAILURE', stageResult: 'FAILURE') {
+                    bat 'npm run validate:kpi'
+                }
             }
         }
 
@@ -68,7 +76,13 @@ pipeline {
 
         stage('Deploy or Block') {
             steps {
-                echo 'All quality gates passed. Deployment approved.'
+                script {
+                    if (currentBuild.currentResult == 'SUCCESS') {
+                        echo 'All quality gates passed. Deployment approved.'
+                    } else {
+                        error('One or more quality gates failed. Deployment blocked.')
+                    }
+                }
             }
         }
     }
