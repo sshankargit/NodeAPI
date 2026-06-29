@@ -16,6 +16,16 @@ pipeline {
                 checkout scm
             }
         }
+        
+        stage('Clean Previous Reports') {
+            steps {
+                bat '''
+                if exist validation\\reports (
+                    del /Q validation\\reports\\*
+                )
+                '''
+            }
+        }
 
         stage('Verify Environment') {
             steps {
