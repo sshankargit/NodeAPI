@@ -152,7 +152,7 @@ async function main() {
     .join("\n");
 
   const template = fs.readFileSync(
-    path.join(__dirname, "gate5_rca_prompt_template.txt"),
+    path.join(__dirname, "gate5_decision_intelligence_prompt.txt"),
     "utf8"
   );
 
