@@ -138,7 +138,7 @@ function writeGate1Summary(metrics, executionLog, phase) {
 
   const summary = {
     gate: "Gate 1 - Closed-loop AI-Assisted Test Generation",
-    status: metrics.finalStatus,
+    status: finalStatus,
     phase,
     initialRunStatus: metrics.initialRunStatus,
     repairAttempted: metrics.repairAttempted,
