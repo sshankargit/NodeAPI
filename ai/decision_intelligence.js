@@ -64,7 +64,7 @@ function buildStructuredSummary() {
   };
 }
 
-function collectFailedGateArtifacts(structuredSummary) {
+function collectFailedGateArtifacts() {
   const files = [
     "gate1_summary.json",
     "gate2_summary.json",
@@ -86,6 +86,59 @@ function collectFailedGateArtifacts(structuredSummary) {
       return `\n===== ${file} =====\n${content || "Not available"}`;
     })
     .join("\n");
+}
+
+function buildDeterministicReasoning(structuredSummary) {
+  const failed = structuredSummary.gateResults.filter(g => g.status === "FAIL");
+
+  const classifications = failed.length
+    ? failed
+        .map(g => `- ${g.gate}: ${g.failureType || "Unknown"}`)
+        .join("\n")
+    : "None";
+
+  const evidence = failed.length
+    ? failed
+        .map(g => {
+          if (g.gate.includes("Gate 1")) {
+            return `- ${g.gate}: status=${g.status}, failureType=${g.failureType}, repairAttempted=${g.repairAttempted}, repairSuccessful=${g.repairSuccessful}`;
+          }
+
+          if (g.gate.includes("Gate 2")) {
+            return `- ${g.gate}: testsExecuted=${g.testsExecuted}, testsPassed=${g.testsPassed}, testsFailed=${g.testsFailed}. Review gate2_summary.json and gate2_api_tests.log.`;
+          }
+
+          if (g.gate.includes("Gate 3")) {
+            const failedChecks = g.failedChecks || [];
+            return `- ${g.gate}: ${failedChecks.length} data validation check(s) failed: ${failedChecks
+              .map(c => `${c.check} expected ${c.expected}, actual ${c.actual}`)
+              .join("; ")}`;
+          }
+
+          if (g.gate.includes("Gate 4")) {
+            return `- ${g.gate}: warehouseRevenue=${g.warehouseRevenue}, dashboardRevenue=${g.dashboardRevenue}, difference=${g.difference}, tolerance=${g.tolerance}`;
+          }
+
+          return `- ${g.gate}: status=${g.status}, failureType=${g.failureType}`;
+        })
+        .join("\n")
+    : "No failed gates detected.";
+
+  return `## Failure Classification
+${classifications}
+
+## Probable Root Cause
+One or more quality gates failed based on structured gate summaries. The most likely root cause is an upstream data, application, or validation issue that affected one or more downstream quality gates.
+
+## Evidence
+${evidence}
+
+## Recommended Resolution
+Review and correct the failed gate outputs. For API validation failures, inspect endpoint behavior and API contract expectations. For data quality failures, restore the expected test data or fix ingestion/reconciliation logic. For KPI mismatches, verify dashboard calculations, warehouse values, and data refresh timing.
+
+## Improvement Recommendations
+Continue using structured gate summaries as the authoritative evidence source for Gate 5. Keep raw logs as supporting diagnostic artifacts only.
+`;
 }
 
 async function getAIReasoning(structuredSummary, artifacts) {
@@ -132,7 +185,13 @@ ${artifacts}
   );
 
   try {
-    return await callOllama(prompt);
+    const response = await callOllama(prompt);
+
+    if (!response.trim().startsWith("## Failure Classification")) {
+      return buildDeterministicReasoning(structuredSummary);
+    }
+
+    return response;
   } catch (error) {
     return `## Failure Classification
 AI reasoning unavailable.
@@ -180,7 +239,7 @@ async function main() {
     JSON.stringify(structuredSummary, null, 2)
   );
 
-  const artifacts = collectFailedGateArtifacts(structuredSummary);
+  const artifacts = collectFailedGateArtifacts();
   const aiReasoning = await getAIReasoning(structuredSummary, artifacts);
   const finalReport = buildFinalReport(structuredSummary, aiReasoning);
 
