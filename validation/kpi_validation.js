@@ -6,5 +6,26 @@ const tolerance=0.01, difference=Math.abs(warehouseRevenue-tableauDashboardReven
 const result={check:"tableau_revenue_kpi_matches_warehouse",warehouseRevenue,tableauDashboardRevenue,tolerance,difference,status:difference<=tolerance?"PASS":"FAIL"};
 fs.writeFileSync(path.join(reportDir,"kpi_validation_report.json"),JSON.stringify({generatedAt:new Date().toISOString(),result},null,2));
 console.table([result]);
+
+const gate4Summary = {
+  gate: "Gate 4 - KPI Validation",
+  status: result.status,
+  failureType: result.status === "FAIL" ? "AnalyticsKPIMismatch" : "None",
+  warehouseRevenue: result.warehouseRevenue,
+  dashboardRevenue: result.tableauDashboardRevenue,
+  tolerance: result.tolerance,
+  difference: result.difference,
+  recommendedAction:
+    result.status === "FAIL"
+      ? "Investigate dashboard KPI calculation, data refresh timing, or warehouse-to-dashboard reconciliation."
+      : "No action required.",
+  generatedAt: new Date().toISOString()
+};
+
+fs.writeFileSync(
+  path.join(reportDir, "gate4_summary.json"),
+  JSON.stringify(gate4Summary, null, 2)
+);
+
 if(result.status==="FAIL"){console.error("KPI validation failed.");process.exit(1);}
 console.log("KPI validation passed.");
