@@ -26,17 +26,23 @@ fs.writeFileSync(
   output
 );
 
-const testsExecutedMatch = output.match(/Tests:\s+(\d+)\s+passed,\s+(\d+)\s+total/i);
-const failedMatch = output.match(/Tests:\s+(\d+)\s+failed/i);
+const testsLine = output.match(/Tests:\s+(.*)/i);
 
-const testsFailed = failedMatch ? Number(failedMatch[1]) : 0;
-const testsExecuted = testsExecutedMatch
-  ? Number(testsExecutedMatch[2])
-  : 0;
+let testsExecuted = 0;
+let testsPassed = 0;
+let testsFailed = 0;
 
-const testsPassed = testsExecutedMatch
-  ? Number(testsExecutedMatch[1])
-  : testsExecuted - testsFailed;
+if (testsLine) {
+  const line = testsLine[1];
+
+  const passed = line.match(/(\d+)\s+passed/i);
+  const failed = line.match(/(\d+)\s+failed/i);
+  const total = line.match(/(\d+)\s+total/i);
+
+  testsPassed = passed ? Number(passed[1]) : 0;
+  testsFailed = failed ? Number(failed[1]) : 0;
+  testsExecuted = total ? Number(total[1]) : testsPassed + testsFailed;
+}
 
 const status = result.status === 0 ? "PASS" : "FAIL";
 
